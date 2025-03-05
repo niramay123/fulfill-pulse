@@ -6,11 +6,11 @@ import { useToast } from '@/components/ui/use-toast';
 export interface Order {
   id: string;
   customer_name: string;
-  customer_email: string;
-  customer_phone: string;
+  customer_email: string | null;
+  customer_phone: string | null;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   total_amount: number;
-  shipping_address: string;
+  shipping_address: string | null;
   delivery_notes: string | null;
   assigned_to: string | null;
   created_at: string;
@@ -69,8 +69,12 @@ export function useOrders() {
 
           if (itemsError) throw itemsError;
 
+          // Cast the order status to the appropriate type
+          const status = order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+          
           ordersWithItems.push({
             ...order,
+            status,
             items: orderItems || []
           });
         }
