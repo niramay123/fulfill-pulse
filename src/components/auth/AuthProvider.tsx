@@ -10,6 +10,7 @@ type AuthContextType = {
   userRole: 'admin' | 'manager' | 'staff' | 'delivery' | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: { first_name?: string; last_name?: string }) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -86,6 +87,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signUp = async (email: string, password: string, metadata?: { first_name?: string; last_name?: string }) => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: metadata
+        }
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      
+      toast.success("Account created successfully!");
+    } catch (error) {
+      console.error("Error signing up:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = async () => {
     try {
       setIsLoading(true);
@@ -100,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, userRole, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user, userRole, isLoading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
