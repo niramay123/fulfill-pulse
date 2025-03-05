@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Package, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ForgotPasswordModal } from "@/components/auth/ForgotPasswordModal";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const { signIn, isLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -66,9 +68,13 @@ const Login = () => {
                 <label htmlFor="password" className="text-sm font-medium">
                   Password
                 </label>
-                <a href="#" className="text-sm text-primary hover:underline">
+                <button 
+                  type="button" 
+                  onClick={() => setForgotPasswordOpen(true)}
+                  className="text-sm text-primary hover:underline"
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -108,6 +114,11 @@ const Login = () => {
           </CardFooter>
         </form>
       </Card>
+      
+      <ForgotPasswordModal
+        isOpen={forgotPasswordOpen}
+        onClose={() => setForgotPasswordOpen(false)}
+      />
     </div>
   );
 };
