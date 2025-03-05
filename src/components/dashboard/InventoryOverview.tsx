@@ -5,16 +5,29 @@ import { Package, TrendingDown, TrendingUp, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useInventory } from "@/hooks/useInventory";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function InventoryOverview() {
-  // Sample inventory data
-  const inventoryItems = [
-    { id: 1, name: "Wireless Headphones", sku: "WH-101", stock: 124, capacity: 150, status: "In Stock", category: "Electronics" },
-    { id: 2, name: "Organic Coffee Beans", sku: "CB-202", stock: 37, capacity: 100, status: "Low Stock", category: "Food & Beverage" },
-    { id: 3, name: "Yoga Mat", sku: "YM-303", stock: 64, capacity: 80, status: "In Stock", category: "Fitness" },
-    { id: 4, name: "Smartphone Case", sku: "SC-404", stock: 9, capacity: 60, status: "Critical", category: "Accessories" },
-    { id: 5, name: "Smart Watch", sku: "SW-505", stock: 26, capacity: 40, status: "In Stock", category: "Electronics" },
-  ];
+  const { inventory, isLoading } = useInventory();
+  
+  // Transform the data for display
+  const inventoryItems = inventory.map(item => ({
+    id: item.id,
+    name: item.product.name,
+    sku: item.product.sku,
+    stock: item.quantity,
+    capacity: item.max_stock_level,
+    status: getStockStatus(item.quantity, item.min_stock_level),
+    category: item.product.category || 'Uncategorized',
+    location: item.location
+  }));
+
+  function getStockStatus(quantity: number, minStock: number) {
+    if (quantity <= minStock * 0.3) return "Critical";
+    if (quantity <= minStock) return "Low Stock";
+    return "In Stock";
+  }
 
   const columns = [
     { header: "Product", accessorKey: "name" },
@@ -46,6 +59,11 @@ export function InventoryOverview() {
         </div>
       ),
     },
+    { 
+      header: "Location", 
+      accessorKey: "location",
+      className: "hidden md:table-cell",
+    },
   ];
 
   function StockBadge({ status }: { status: string }) {
@@ -58,19 +76,40 @@ export function InventoryOverview() {
     }
   }
 
+  const lowStockCount = inventoryItems.filter(item => item.status === "Low Stock").length;
+  const outOfStockCount = inventoryItems.filter(item => item.status === "Critical").length;
+  const totalItems = inventory.length;
+  const stockUtilization = Math.round(
+    inventory.reduce((acc, item) => acc + (item.quantity / item.max_stock_level * 100), 0) / 
+    (inventory.length || 1)
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-fade-up">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-[120px] w-full" />
+          ))}
+        </div>
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fade-up">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard 
           title="Total Inventory Items" 
-          value="1,243" 
+          value={totalItems.toString()} 
           icon={Package}
           trend={{ value: 3.2, positive: true }}
         />
         
         <StatCard 
           title="Stock Utilization" 
-          value="76" 
+          value={stockUtilization.toString()} 
           valueSuffix="%" 
           icon={TrendingUp}
           trend={{ value: 1.8, positive: true }}
@@ -78,7 +117,7 @@ export function InventoryOverview() {
         
         <StatCard 
           title="Low Stock Items" 
-          value="17" 
+          value={lowStockCount.toString()} 
           icon={TrendingDown}
           trend={{ value: 5.1, positive: false }}
           className="border-amber-200 bg-amber-50/50"
@@ -86,7 +125,7 @@ export function InventoryOverview() {
         
         <StatCard 
           title="Out of Stock" 
-          value="3" 
+          value={outOfStockCount.toString()} 
           icon={AlertTriangle}
           trend={{ value: 2.3, positive: false }}
           className="border-red-200 bg-red-50/50"

@@ -6,30 +6,40 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import { AuthProvider } from "./components/auth/AuthProvider";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/inventory" element={<Index />} />
-          <Route path="/orders" element={<Index />} />
-          <Route path="/warehouse" element={<Index />} />
-          <Route path="/staff" element={<Index />} />
-          <Route path="/delivery" element={<Index />} />
-          <Route path="/analytics" element={<Index />} />
-          <Route path="/products" element={<Index />} />
-          <Route path="/integrations" element={<Index />} />
-          <Route path="/settings" element={<Index />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/inventory" element={<Index />} />
+              <Route path="/orders" element={<Index />} />
+              <Route path="/warehouse" element={<Index />} />
+              <Route path="/staff" element={<Index />} />
+              <Route path="/delivery" element={<Index />} />
+              <Route path="/analytics" element={<Index />} />
+              <Route path="/products" element={<Index />} />
+              <Route path="/integrations" element={<Index />} />
+              <Route path="/settings" element={<Index />} />
+            </Route>
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

@@ -69,7 +69,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       )}>
         {isOpen ? (
           <>
-            <span className="font-medium text-sidebar-foreground">FulfillPulse</span>
+            <span className="font-medium text-sidebar-foreground">DarkStore</span>
             <Button 
               variant="ghost" 
               size="icon" 
@@ -86,7 +86,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             onClick={onToggle}
             className="h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent"
           >
-            <span className="font-bold text-sidebar-primary">F</span>
+            <span className="font-bold text-sidebar-primary">D</span>
           </Button>
         )}
       </div>
@@ -127,8 +127,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         )}>
           {isOpen ? (
             <div className="flex flex-col">
-              <span className="text-xs font-medium">FulfillPulse v1.0</span>
-              <span className="text-2xs text-sidebar-foreground/50">© 2023 FulfillPulse Inc.</span>
+              <span className="text-xs font-medium">DarkStore v1.0</span>
+              <span className="text-2xs text-sidebar-foreground/50">© 2023 DarkStore Inc.</span>
             </div>
           ) : (
             <span className="text-2xs">v1.0</span>
